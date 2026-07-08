@@ -1,0 +1,122 @@
+[
+  {
+    "question": "What is the difference between a Request and a PreparedRequest?",
+    "expected_file": "requests/models.py",
+    "expected_symbol": "PreparedRequest"
+  },
+  {
+    "question": "How are event hooks registered on a request?",
+    "expected_file": "requests/models.py",
+    "expected_symbol": "RequestHooksMixin"
+  },
+  {
+    "question": "How is the path URL built for a request?",
+    "expected_file": "requests/models.py",
+    "expected_symbol": "RequestEncodingMixin"
+  },
+  {
+    "question": "What parameters can you pass when creating a Request object?",
+    "expected_file": "requests/models.py",
+    "expected_symbol": "Request"
+  },
+  {
+    "question": "What attributes does the Response object expose?",
+    "expected_file": "requests/models.py",
+    "expected_symbol": "Response"
+  },
+  {
+    "question": "How is a Basic Auth header string constructed?",
+    "expected_file": "requests/auth.py",
+    "expected_symbol": "_basic_auth_str"
+  },
+  {
+    "question": "What must a custom auth class implement to work with requests?",
+    "expected_file": "requests/auth.py",
+    "expected_symbol": "AuthBase"
+  },
+  {
+    "question": "How does HTTPProxyAuth differ from HTTPBasicAuth?",
+    "expected_file": "requests/auth.py",
+    "expected_symbol": "HTTPProxyAuth"
+  },
+  {
+    "question": "How does Digest Authentication track state across requests?",
+    "expected_file": "requests/auth.py",
+    "expected_symbol": "HTTPDigestAuth"
+  },
+  {
+    "question": "Why does requests need a MockRequest class for cookie handling?",
+    "expected_file": "requests/cookies.py",
+    "expected_symbol": "MockRequest"
+  },
+  {
+    "question": "How are cookies extracted from a response and stored in a jar?",
+    "expected_file": "requests/cookies.py",
+    "expected_symbol": "extract_cookies_to_jar"
+  },
+  {
+    "question": "How is a Cookie header string produced for an outgoing request?",
+    "expected_file": "requests/cookies.py",
+    "expected_symbol": "get_cookie_header"
+  },
+  {
+    "question": "Why does RequestsCookieJar expose a dict-like interface?",
+    "expected_file": "requests/cookies.py",
+    "expected_symbol": "RequestsCookieJar"
+  },
+  {
+    "question": "How do you merge cookies from a dictionary into an existing CookieJar?",
+    "expected_file": "requests/cookies.py",
+    "expected_symbol": "merge_cookies"
+  },
+  {
+    "question": "What is the base exception class for all requests-related errors?",
+    "expected_file": "requests/exceptions.py",
+    "expected_symbol": "RequestException"
+  },
+  {
+    "question": "Why does ConnectTimeout inherit from both ConnectionError and Timeout?",
+    "expected_file": "requests/exceptions.py",
+    "expected_symbol": "ConnectTimeout"
+  },
+  {
+    "question": "What exception is raised when a URL scheme is missing or invalid?",
+    "expected_file": "requests/exceptions.py",
+    "expected_symbol": "MissingSchema"
+  },
+  {
+    "question": "What error occurs when a request body can't be rewound for a retry?",
+    "expected_file": "requests/exceptions.py",
+    "expected_symbol": "UnrewindableBodyError"
+  },
+  {
+    "question": "How does requests determine the length of a request body regardless of its type?",
+    "expected_file": "requests/utils.py",
+    "expected_symbol": "super_len"
+  },
+  {
+    "question": "How does requests read credentials from a netrc file?",
+    "expected_file": "requests/utils.py",
+    "expected_symbol": "get_netrc_auth"
+  },
+  {
+    "question": "How is a URI normalized to ensure consistent percent-encoding?",
+    "expected_file": "requests/utils.py",
+    "expected_symbol": "requote_uri"
+  },
+  {
+    "question": "How does requests decide whether to bypass proxies for a given URL?",
+    "expected_file": "requests/utils.py",
+    "expected_symbol": "should_bypass_proxies"
+  },
+  {
+    "question": "How is the JSON response encoding detected from a byte order mark?",
+    "expected_file": "requests/utils.py",
+    "expected_symbol": "guess_json_utf"
+  },
+  {
+    "question": "How is a request body's file pointer rewound before a redirect retry?",
+    "expected_file": "requests/utils.py",
+    "expected_symbol": "rewind_body"
+  }
+]
