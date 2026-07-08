@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
+import logging
 from dotenv import load_dotenv
 import os
 
@@ -11,7 +12,12 @@ from sqlalchemy import text
 from pydantic import BaseModel
 from retrieval import hybrid_search
 
+from fastapi.responses import StreamingResponse
+import json
 
+from generation import generate_answer, extract_citations
+
+logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 RAW_DATABASE_URL = os.environ["DATABASE_URL"]
@@ -67,3 +73,22 @@ class QueryRequest(BaseModel):
 async def query(req: QueryRequest, db: AsyncSession = Depends(get_db)):
     results = await hybrid_search(db, req.question, k=req.k)
     return {"question": req.question, "results": results}
+
+
+@app.post("/query/stream")
+async def query_stream(req: QueryRequest, db: AsyncSession = Depends(get_db)):
+    chunks = await hybrid_search(db, req.question, k=req.k)
+
+    async def event_generator():
+        full_answer = ""
+        async for token in generate_answer(req.question, chunks):
+            full_answer += token
+            # SSE format: "event: <name>\ndata: <payload>\n\n"
+            payload = json.dumps({"token": token})
+            yield f"event: token\ndata: {payload}\n\n"
+
+        citations = extract_citations(full_answer, chunks)
+        payload = json.dumps({"citations": citations})
+        yield f"event: citations\ndata: {payload}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
