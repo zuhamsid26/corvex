@@ -17,6 +17,8 @@ import json
 
 from generation import generate_answer, extract_citations
 
+from fastapi.middleware.cors import CORSMiddleware
+
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
@@ -56,7 +58,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Corvex API", lifespan=lifespan)
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 async def health(db: AsyncSession = Depends(get_db)):
@@ -75,15 +82,14 @@ async def query(req: QueryRequest, db: AsyncSession = Depends(get_db)):
     return {"question": req.question, "results": results}
 
 
-@app.post("/query/stream")
-async def query_stream(req: QueryRequest, db: AsyncSession = Depends(get_db)):
-    chunks = await hybrid_search(db, req.question, k=req.k)
+@app.get("/query/stream")
+async def query_stream(question: str, k: int = 10, db: AsyncSession = Depends(get_db)):
+    chunks = await hybrid_search(db, question, k=k)
 
     async def event_generator():
         full_answer = ""
-        async for token in generate_answer(req.question, chunks):
+        async for token in generate_answer(question, chunks):
             full_answer += token
-            # SSE format: "event: <name>\ndata: <payload>\n\n"
             payload = json.dumps({"token": token})
             yield f"event: token\ndata: {payload}\n\n"
 
