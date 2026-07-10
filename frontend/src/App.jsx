@@ -10,6 +10,7 @@ function App() {
   const [input, setInput] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const eventSourceRef = useRef(null)
+  const [error, setError] = useState(null)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -21,10 +22,11 @@ function App() {
     setMessages((prev) => [
       ...prev,
       { role: 'user', content: question },
-      { role: 'assistant', content: '', citations: [] },
+      { role: 'assistant', content: '', citations: null },
     ])
     setInput('')
     setIsStreaming(true)
+    setError(null)
 
     const url = `${API_BASE}/query/stream?question=${encodeURIComponent(question)}&k=5`
     const es = new EventSource(url)
@@ -55,6 +57,16 @@ function App() {
     es.onerror = () => {
       es.close()
       setIsStreaming(false)
+      // Only show an error if we never got a proper close via the
+      // citations event — EventSource sometimes fires onerror even
+      // after a clean finish, so guard against a false-positive banner.
+      setMessages((prev) => {
+        const last = prev[prev.length - 1]
+        if (last && last.role === 'assistant' && last.citations === null) {
+          setError('Something went wrong while generating the answer. Please try again.')
+        }
+        return prev
+      })
     }
   }
 
@@ -100,19 +112,25 @@ function App() {
                   >
                     {msg.content}
                   </ReactMarkdown>
-                  {msg.citations && msg.citations.length > 0 && (
+                  {msg.citations && (
                     <div className="mt-3 pt-3 border-t border-slate-700 space-y-1">
-                      <p className="text-xs text-slate-400 font-semibold">Sources:</p>
-                      {msg.citations.map((c, ci) => (
-                        <div key={ci} className="text-xs text-slate-400">
-                          <span className="text-blue-400">{c.symbol_name || '(module-level)'}</span>
-                          {' — '}
-                          <span className="font-mono">{c.filepath.replace('../corvex_data/requests/src/', '')}</span>
-                          {c.start_line && c.end_line && (
-                            <span className="text-slate-500"> (lines {c.start_line}–{c.end_line})</span>
-                          )}
-                        </div>
-                      ))}
+                      {msg.citations.length > 0 ? (
+                        <>
+                          <p className="text-xs text-slate-400 font-semibold">Sources:</p>
+                          {msg.citations.map((c, ci) => (
+                            <div key={ci} className="text-xs text-slate-400">
+                              <span className="text-blue-400">{c.symbol_name || '(module-level)'}</span>
+                              {' — '}
+                              <span className="font-mono">{c.filepath.replace('../corvex_data/requests/src/', '')}</span>
+                              {c.start_line && c.end_line && (
+                                <span className="text-slate-500"> (lines {c.start_line}–{c.end_line})</span>
+                              )}
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                        <p className="text-xs text-slate-500 italic">No sources cited for this response.</p>
+                      )}
                     </div>
                   )}
                 </>
@@ -122,8 +140,23 @@ function App() {
             </div>
           </div>
         ))}
+        {isStreaming && messages[messages.length - 1]?.content === '' && (
+          <div className="text-left">
+            <div className="inline-block bg-slate-800 text-slate-400 rounded-lg px-4 py-2 text-sm italic">
+              Thinking...
+            </div>
+          </div>
+        )}
       </main>
 
+      {error && (
+        <div className="max-w-3xl mx-auto w-full px-4 pb-2">
+          <div className="bg-red-900/50 border border-red-700 text-red-200 text-sm rounded-lg px-4 py-2">
+            {error}
+          </div>
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className="border-t border-slate-700 p-4 flex gap-2 max-w-3xl mx-auto w-full">
         <input
           type="text"
