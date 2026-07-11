@@ -6,7 +6,6 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 
 function App() {
-  console.log('DEBUG API_BASE:', import.meta.env.VITE_API_BASE_URL)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
