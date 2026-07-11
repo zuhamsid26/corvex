@@ -63,7 +63,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Corvex API", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://corvex-wheat.vercel.app",
+    ],
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
