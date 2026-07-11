@@ -26,7 +26,7 @@ Rules:
 
 
 CITATION_PATTERN = re.compile(
-    r"\(file:\s*([^,]+?),\s*symbol:\s*([^)]+?)\)"
+    r"\(file:\s*`?([^,`]+?)`?\s*,\s*symbol:\s*`?(\(module-level\)|[^)`]+?)`?\s*\)"
 )
 
 load_dotenv()
